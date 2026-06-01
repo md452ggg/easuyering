@@ -268,6 +268,15 @@
             <input type="text" id="myRefLink" class="w-full bg-black p-2 mt-2 rounded border border-gray-700 text-xs text-red-500" readonly>
             <button onclick="copyRefLink()" class="mt-3 w-full bg-red-500 py-2 rounded text-xs font-bold text-white">Copy Link</button>
         </div>
+<div class="bg-[#1a2236] p-4 rounded-xl border border-gray-700 mt-4">
+  <div class="flex items-center gap-2 mb-2">
+    <div class="bg-orange-500 rounded-full w-6 h-6 flex items-center justify-center text-[10px] font-bold text-white">TRX</div>
+    <h3 class="text-white font-semibold">Important Notice</h3>
+  </div>
+  <p class="text-gray-300 text-[13px]">
+    If you refer a friend to our platform, you will receive a direct <b>15% bonus!</b> Copy your referral link and share it today.
+  </p>
+</div>
 
             <div class="grid grid-cols-2 gap-4">
                 <div class="bg-[#1a2236] p-4 rounded-xl border border-gray-800 text-center">
@@ -281,6 +290,7 @@
             </div>
         </div>
     </div>
+    
 <div id="aboutPage" class="page w-full min-h-screen bg-[#0f172a] fixed top-0 left-0 z-[9999] hidden">
     
     <div class="flex flex-col w-full h-full p-4">
@@ -771,6 +781,19 @@ if (refCode) {
             document.getElementById('myRefLink').value = refUrl;
         }
     }
+    function copyRefLink() {
+  const copyText = document.getElementById("myRefLink");
+  if (copyText) {
+    copyText.select();
+    copyText.setSelectionRange(0, 99999);
+    navigator.clipboard.writeText(copyText.value).then(() => {
+      alert("Referral link copied successfully!");
+    }).catch(err => {
+      console.error('Failed to copy: ', err);
+    });
+  }
+}
+
     function loadHistory() {
     const historyList = document.getElementById('historyList');
     if (!historyList) return;
